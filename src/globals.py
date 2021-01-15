@@ -49,7 +49,11 @@ class GlobalVar(object):
 	'''
 	#conda env variables
 	envpath_=subprocess.run("which python3", shell=True, capture_output=True).stdout.decode('utf-8').strip().replace('python3' , '')
-	condaenv_=os.environ['CONDA_DEFAULT_ENV']
+	try:
+		condaenv_=os.environ['CONDA_DEFAULT_ENV']
+	except KeyError:
+		print("IPD conda environment needs to be activated before running any program in IPD package.\nPlease refer to UserManual or README file of IPD.")
+		sys.exit(0)
 	#Conda experimental
 	fastp_="fastp"
 	hisat2_="hisat2"
@@ -87,6 +91,8 @@ class GlobalVar(object):
 	porechop_="python3 ../external/Porechop/porechop-runner.py"
 	minimap2_="../external/minimap2/minimap2"
 	'''
+	porechop_="porechop"
+	minimap2_="minimap2"
 	minimap2index_="../data/primaryref/pathoref/patho.minimap2.ref"
 	pathogff_="../data/annotation/patho.gff"
 	#No entry for NanoFilt and longshot, since these will be directly run on CLI

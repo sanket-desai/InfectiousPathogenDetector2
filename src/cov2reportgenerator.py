@@ -19,6 +19,7 @@ import subprocess
 from markdown import markdown
 from localblastn import *
 from gisaidmetadataparser import *
+from variantcladeassessment import *
 
 '''
 Input to the object: Output Directory of IPD
@@ -32,14 +33,14 @@ class CustomError(Exception):
 class CoV2ReportGenerator(object):
 	def __init__(self, outdir=None):
 		if outdir:
-			self.outdir=outdir
+			#self.outdir=outdir
 			self.vcf_map={}
 			self.countfile_map={}
 			self.total_fragment_list=[]
 			self.coverage_map={}
 			self.summaryout_map={}
 			self.contig_map={}
-			self.cov2outdir=os.path.join(self.outdir, "cov2output")
+			self.cov2outdir=os.path.join(outdir, "cov2output")
 			if not os.path.exists(self.cov2outdir):
 				os.mkdir(self.cov2outdir)
 			for file in os.listdir(self.outdir):
@@ -75,6 +76,7 @@ class CoV2ReportGenerator(object):
 					self.vcf_map[sample]=vcf
 			try:
 				#where clade assignment happens
+				self.varcladeassessmentobj_=VariantCladeAssessment(self.vcf_map)
 				#self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
 			except:
 				print("Clade assessment Object not created. Error!!")
@@ -284,7 +286,8 @@ class CoV2ReportGenerator(object):
 	def get_clade_assessment(self):
 		clade_df=pd.DataFrame()
 		try:
-			clade_df=self.clade_assessment_obj.get_pandas_df_clade_assessment()
+			#clade_df=self.clade_assessment_obj.get_pandas_df_clade_assessment()
+			clade_df=self.varcladeassessmentobj_.get_clade_assessment_data_frame()
 		except:
 			print("Error in Clade Assessment")
 		cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
@@ -295,7 +298,8 @@ class CoV2ReportGenerator(object):
 	def get_novel_variant(self):
 		novel_var_df=pd.DataFrame()
 		try:
-			novel_var_df=self.clade_assessment_obj.get_pandas_df_novel_variant()
+			#novel_var_df=self.clade_assessment_obj.get_pandas_df_novel_variant()
+			novel_var_df=self.varcladeassessmentobj_.get_novel_variant_data_frame()
 		except:
 			print("Error in Novel Variant")
 		novel_var_out=os.path.join(self.cov2outdir,"Novel_variant.csv")

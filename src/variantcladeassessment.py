@@ -216,11 +216,15 @@ class VariantAssessment(object):
 
 #A wrapper class to perform both variant check and clade assignment and tabulate in panda frame
 class VariantCladeAssessment(object):
-    def __init__(self, vcfmap): #{ samplename->vcffile path }
+    def __init__(self, vcfmap): # , outdir): #{ samplename->vcffile path }
+    #self.cov2outdir=os.path.join(self.outdir, "cov2output")
         data=[] #array of array each line. Fill and then give to dataFrame function
-		novdfcol=["Sample","Genome","Position","Reference","Altered","Consequence","Gene","Transcript","Protein Change"]
+        novdfcol=["Sample","Genome","Position","Reference","Altered","Consequence","Gene","Transcript","Protein Change"]
+        cladedfcol=["Sample","Number of variants", "Related GISAID genome", "Clade", "Subclade"]
         novvararr=[]
-        novelvardf=pd.DataFrame()
+        cladesarr=[]
+        self.novelvardf_=pd.DataFrame()
+        self.cladedf_=pd.DataFrame()
         for sample in vcfmap:
             va=VariantAssessment(vcffile)
             ca=CladeAssignment(vcffile)
@@ -232,10 +236,23 @@ class VariantCladeAssessment(object):
                     gene=ann[3]
                     transcript=ann[4]
                     protein_change=ann[10]
-                    nvrec=[ sample, n.chrom, n.pos, n.ref, alt, conseq, gene, transcript, protein_change]
+                    nvrec=[ sample, n.chrom, str(n.pos), n.ref, alt, conseq, gene, transcript, protein_change]
                     novvararr.append(nvrec)
+            #start filling clade line
+            cnumvar=va.get_number_of_variants()
+            crelatedgisaid=va.closest_gisaid_sample()+ " (" + va.closest_gisaid_number_of_variant_overlap() +")"
+            cclade=ca.assigned_clade()
+            csubclade=ca.assigned_subclade()
+            cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade, csubclade])
         if len(novvararr)>0:
-            novelvardf = pd.DataFrame(novvararr, columns = novdfcol)
+            self.novelvardf_ = pd.DataFrame(novvararr, columns = novdfcol)
+        else:
+            self.novelvardf_= pd.DataFrame([ [str(sample),"","","","","","","",""] ], columns= novdfcol)
+        self.cladedf_ = pd.DataFrame(cladesarr, columns = cladedfcol)
         #xxxxxxxxxx
-		cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
-		clade_df.to_csv(cov2_clade_out)
+    def get_novel_variant_data_frame(self):
+        return self.novelvardf_
+    def get_clade_assessment_data_frame(self):
+        return self.cladedf_
+		#cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
+		#clade_df.to_csv(cov2_clade_out)
