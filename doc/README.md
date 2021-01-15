@@ -1,49 +1,33 @@
-# IPD (Infection Pathogen Detector)
+# IPD2 (Infection Pathogen Detector2)
 
-IPD is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogeneous NGS platforms. IPD performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and to generate an automated report.
+IPD2 (an updated version of [Infectious Pathogen Detector2](https://github.com/sanket-desai/InfectiousPathogenDetector)) is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogeneous NGS platforms. IPD2 performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD2 additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and to generate an automated report.
 
 ## Getting Started
 
-### Prerequisites required for installation of IPD
+### Prerequisites required for installation of IPD2
 
-There are two automated interfaces for the tool either of them can be used by the user. It is developed using python3.
+IPD2 is developed using python3.
 
 **System Prerequisites:**
 
-  - [Pip3](https://pip.pypa.io/en/stable/installing/)
-  - [Python3](https://realpython.com/installing-python/)
   - [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
-  - [Make](https://www.gnu.org/software/make/)
-  - [CMAKE](https://cmake.org/install/)
-  - [Java](https://java.com/en/download/)
-  - [Meson](https://mesonbuild.com/) 
 
 With the following system prerequisites in place, users can use the following commands in the Linux / Unix environment to install the required python packages.
 
-**Python Packages:**
-
-  - [Pysam](https://pypi.org/project/pysam/): pip3 install pysam
-  - [Tkinter](For only GUI: https://tkdocs.com/tutorial/install.html)
-
-**Packages Required for automated report generation:**
-
-  - [Numpy](https://pypi.org/project/numpy/) : pip3 install numpy
-  - [Matplotlib](https://pypi.org/project/matplotlib/): pip3 install matplotlib
-  - [Pandas](https://pypi.org/project/pandas/): pip3 install pandas
-  - [SciPy](https://pypi.org/project/scipy/): pip3 install scipy
-  - [pdfkit](https://pypi.org/project/pdfkit/): pip3 install pdfkit
-
 ### Installation
 
-The installation of the IPD has been tested on Fedora/Red Hat OS
-
-IPD can be downloaded from [http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html][PlDb]. The downloaded tar file (ipd.tar.gz) should be untar using the following command.
-
-```
-$ tar xvzf ipd.tar.gz
+IPD2 can be downloaded from [http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html][PlDb]. The pre-build reference files need to be downloaded from the webpage: http://ipd.actrec.gov.in/referencedatabase/data.gz
+Place the data.gz in the IPD2 home directory and unzip is using the following command:
 ```
 
-Install script helps the user to sets up the tools, download and index the required databases (primary and secondary). On the terminal the user needs to go inside the IPD directory and then run the install command as shown below:
+```
+In the home directory of IPD2, where it is downloaded, run the following command:
+
+```
+conda env create -f ipdenv.yml
+```
+
+
 
 ```
 $ cd ipd
