@@ -16,12 +16,12 @@ With the following system prerequisites in place, users can use the following co
 
 ### Installation
 
-IPD 2.0 can be downloaded from [http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html][PlDb]. Untar the downloaded tar.gz file using the following command:
+IPD 2.0 can be downloaded from this [webpage](http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html). Untar the downloaded tar.gz file using the following command:
 ```
 tar xvzf ipd2.tar.gz
 cd ipd2
 ```
-The pre-build reference files need to be downloaded from here: http://ipd.actrec.gov.in/referencedatabase/data.tar.gz . Place the data.gz in the IPD2 home directory (ipd2) and unzip is using the following command:
+The pre-build reference files need to be downloaded from [here](http://ipd.actrec.gov.in/referencedatabase/data.tar.gz). Place the data.gz in the IPD2 home directory (ipd2) and unzip is using the following command:
 ```
 tar xvzf data.tar.gz
 ```
