@@ -212,8 +212,8 @@ class IPDLongRead(object):
         #cmd="conda activate medaka"
         #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         #cprocess.check_returncode()
-        #cmd="medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_['threads'])+" -o "+ self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant" #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
-        cmd="bash -i conda_activate.sh "+self.primarysortedbam_ +" "+GlobalVar.pathofa_+" "+self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant"+" "+str(self.inputmap_['threads']) #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
+        cmd="medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_['threads'])+" -o "+ self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant" #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
+        #cmd="bash -i conda_activate.sh "+self.primarysortedbam_ +" "+GlobalVar.pathofa_+" "+self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant"+" "+str(self.inputmap_['threads']) #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         cmd=GlobalVar.vcffilter_+ " -f \"QUAL > 20\" " + self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant/round_1.vcf > "+self.primarysortedbam_.replace(".bam","_medaka.vcf")
@@ -228,14 +228,19 @@ class IPDLongRead(object):
         cmd=GlobalVar.lofreq_+" call -f "+GlobalVar.pathofa_+" -o "+self.primarysortedbam_.replace(".bam","_lofreq1.vcf")+" "+self.primarysortedbam_
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-        cmd=GlobalVar.vcffilter_+" -f \"DP > 10 & AF > 0.75\" "+ self.primarysortedbam_.replace(".bam","_lofreq1.vcf") +" > "+self.primarysortedbam_.replace(".bam","_lofreq.vcf")
+        cmd=GlobalVar.vcffilter_+" -f \"DP > 5 & AF > 0.5\" "+ self.primarysortedbam_.replace(".bam","_lofreq1.vcf") +" > "+self.primarysortedbam_.replace(".bam","_lofreq.vcf")
         #print(cmd)
         cprocess=subprocess.run(cmd, shell=True)
         cprocess.check_returncode()
         #freebayes two-pass variant calling
-        cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
-        cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-        cprocess.check_returncode()
+	    cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
+	    cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
+	    cprocess.check_returncode()
+	    cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_r1.vcf"
+        #cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
+        #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+        #cprocess.check_returncode()
+
         cmd=GlobalVar.bgzip_+" "+self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
@@ -243,7 +248,7 @@ class IPDLongRead(object):
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
 
-        cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  --min-repeat-entropy 1 --haplotype-length 500 --haplotype-basis-alleles "+ self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf.gz")+" "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20 & DP > 10 & AF > 0.75\" > "  +self.primarysortedbam_.replace(".bam","_freebayes.vcf")
+        cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  --min-repeat-entropy 1 --haplotype-length 500 --haplotype-basis-alleles "+ self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf.gz")+" "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20 & DP > 5 & AF > 0.5\" > "  +self.primarysortedbam_.replace(".bam","_freebayes.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
 
@@ -288,26 +293,7 @@ class IPDLongRead(object):
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         print("Final variant calls made")
-        #Where it fails
-        #cmd=GlobalVar.vcffilter_+" -f \"DP > 10 & AF > 0.75\" "+ self.ipdfinalvcf_.replace(".vcf","n1.vcf") +" > "+self.ipdfinalvcf_
-        #print(cmd)
-        #cprocess=subprocess.run(cmd, shell=True)
-        #cprocess.check_returncode()
-
-#        cmd=GlobalVar.bcftools_+" view -v indels "+self.primarysortedbam_.replace(".bam","_sr.vcf.gz -o ")+ self.primarysortedbam_.replace(".bam", "_sr_indel.vcf.gz -O z")
-#        cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-#        cprocess.check_returncode()
-#        cmd=GlobalVar.bcftools_+" index "+self.primarysortedbam_.replace(".bam","_snp.vcf.gz")
-#        cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-#        cprocess.check_returncode()
-#        cmd=GlobalVar.bcftools_+" index "+self.primarysortedbam_.replace(".bam","_sr_indel.vcf.gz")
-#        cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-#        cprocess.check_returncode()
-
-#        cmd=GlobalVar.bcftools_+" isec -n 1 -o "+self.ipdfinalvcf_+ " "+self.primarysortedbam_.replace(".bam","_snp.vcf.gz ")+ self.primarysortedbam_.replace(".bam","_sr_indel.vcf.gz -f PASS -O v -w 1")
-#        cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-#        cprocess.check_returncode()
-        cmd=GlobalVar.snpeff_+" -dataDir "+GlobalVar.snpeffdatadir_+" -nodownload ipd1060 "+self.ipdfinalvcf_+" > "+self.ipdfinalannotatedvcf_
+        cmd=GlobalVar.snpeff_+" -dataDir "+GlobalVar.snpeffdatadir_+" -c "+ GlobalVar.snpeffconfig_ +" -nodownload ipd1060 "+self.ipdfinalvcf_+" > "+self.ipdfinalannotatedvcf_+" -noStats"
         #Commented only to be run on Param / otherwise uncomment this and RUN
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
