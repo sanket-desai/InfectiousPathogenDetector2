@@ -198,22 +198,7 @@ class IPDLongRead(object):
 
     def variantcalling(self):
         #medaka
-        #cmd="conda init bash"
-        #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-        #cprocess.check_returncode()
-        #cmd='bash -c \"source activate medaka; medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_['threads'])+" -o "+ self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant" #self.primarysortedbam_.replace(".bam", "_medaka.vcf\"')
-        #medakacmd="medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_["threads"])+" -o "+ self.inputmap_["outdir"]+self.samplebasename_+"_medaka_variant"
-        #cmd="source activate medaka && 'medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_["threads"])+" -o "+ self.inputmap_["outdir"]+self.samplebasename_+"_medaka_variant"' && source deactivate"
-        #cmd="source activate medaka ; "+medakacmd
-        #my_env = os.environ.copy()
-        #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)#, env=my_env)
-        #cprocess=subprocess.run(medakacmd, shell=True, stdout=subprocess.DEVNULL)#, env=my_env)
-        #cprocess.check_returncode()
-        #cmd="conda activate medaka"
-        #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-        #cprocess.check_returncode()
         cmd="medaka_variant -i "+self.primarysortedbam_ +" -f "+GlobalVar.pathofa_+" -p -t "+ str(self.inputmap_['threads'])+" -o "+ self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant" #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
-        #cmd="bash -i conda_activate.sh "+self.primarysortedbam_ +" "+GlobalVar.pathofa_+" "+self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant"+" "+str(self.inputmap_['threads']) #self.primarysortedbam_.replace(".bam", "_medaka.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         cmd=GlobalVar.vcffilter_+ " -f \"QUAL > 20\" " + self.inputmap_['outdir']+self.samplebasename_+"_medaka_variant/round_1.vcf > "+self.primarysortedbam_.replace(".bam","_medaka.vcf")
@@ -233,10 +218,10 @@ class IPDLongRead(object):
         cprocess=subprocess.run(cmd, shell=True)
         cprocess.check_returncode()
         #freebayes two-pass variant calling
-	    cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
-	    cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
-	    cprocess.check_returncode()
-	    cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_r1.vcf"
+        cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
+        cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
+        cprocess.check_returncode()
+        cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_r1.vcf"
         #cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         #cprocess.check_returncode()
