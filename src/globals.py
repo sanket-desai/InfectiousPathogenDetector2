@@ -9,7 +9,8 @@ Description : Static classes with global variables storing tool and database pat
 import sys
 import os
 import subprocess
-
+#Available with python > 3.5
+from pathlib import Path
 
 class GlobalFormatException(Exception):
 	def __init__(self, exstr):
@@ -55,6 +56,14 @@ class GlobalVar(object):
 		print("IPD conda environment needs to be activated before running any program in IPD package.\nPlease refer to UserManual or README file of IPD.")
 		sys.exit(0)
 	#Conda experimental
+	envshare_=envpath_.replace("/bin/","/share/")
+	snpeffjar_=''
+	picardjar_=''
+	for path in Path(envshare_).rglob('*.jar'):
+		if str(path).endswith("snpEff.jar"):
+			snpeffjar_=str(path)
+		elif str(path).endswith("picard.jar"):
+			picardjar_=str(path)
 	fastp_="fastp"
 	hisat2_="hisat2"
 	hisat2_build_="hisat2-build"
@@ -63,13 +72,13 @@ class GlobalVar(object):
 	featurecounts_="featureCounts"
 	samtools_="samtools"
 	#megahit_="../external/MEGAHIT-1.2.9-Linux-x86_64-static/bin/megahit"
-	picard_="picard"
+	picard_="java -Xmx10G -jar "+picardjar_
 	bcftools_="bcftools"
 	varscan_="varscan"
 	bgzip_="bgzip"
 	tabix_="tabix"
 	lofreq_="lofreq"
-	snpeff_="snpEff"
+	snpeff_="java -Xmx10G -jar "+snpeffjar_
 	freebayes_="freebayes"
 	#freebayes_="../external/freebayes/bin/freebayes"
 	freebayesparallel_="freebayes-parallel"
