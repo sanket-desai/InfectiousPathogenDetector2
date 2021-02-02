@@ -16,23 +16,24 @@ With the following system prerequisites in place, users can use the following co
 
 ### Installation
 
-IPD2 can be downloaded from [http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html][PlDb]. The pre-build reference files need to be downloaded from the webpage: http://ipd.actrec.gov.in/referencedatabase/data.gz
-Place the data.gz in the IPD2 home directory and unzip is using the following command:
+IPD2 can be downloaded from [http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html][PlDb]. Untar the downloaded tar.gz file using the following command:
 ```
-
+tar xvzf ipd2.tar.gz
+cd ipd2
 ```
-In the home directory of IPD2, where it is downloaded, run the following command:
+The pre-build reference files need to be downloaded from the webpage: http://ipd.actrec.gov.in/referencedatabase/data.tar.gz . Place the data.gz in the IPD2 home directory (ipd2) and unzip is using the following command:
+```
+tar xvzf data.tar.gz
+```
+In the home directory of IPD2 (ipd2), run the following command:
 
 ```
 conda env create -f ipdenv.yml
 ```
+This installs all the dependencies and tools required to run IPD2.
+Please note: Make sure you do not have the tools such as Blast, Hisat2, Subread / FeatureCounts, minimap2 added in the PATH variable. The tools on the host machine (when in PATH) are prioritized in usage when compared to the once present in the Conda environment.
 
-
-
-```
-$ cd ipd
-$ bash install.sh
-```
+For running any script pertaining to IPD2, make sure that the IPD Conda environment is activated. More information about Conda environments can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
 **Adding pathogens of choice to IPD database**
 
