@@ -306,8 +306,8 @@ class IPDShortRead(object):
 
 	def variantcalling(self):
 		#cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf"
-		cmd=GlobalVar.freebayes_+" < (fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 10000) "+ self.inputmap_['threads'] +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
-		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+		cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 10000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
+		cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
 		cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf"
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
@@ -345,7 +345,7 @@ class IPDShortRead(object):
 		cprocess.check_returncode()
 
 		#Commented only to be run on Param / otherwise uncomment this and RUN
-		cmd=GlobalVar.snpeff_+" -dataDir "+GlobalVar.snpeffdatadir_+" -nodownload ipd1060 "+self.ipdfinalvcf_+" > "+self.ipdfinalannotatedvcf_+" -noStats"
+		cmd=GlobalVar.snpeff_+" -dataDir "+GlobalVar.snpeffdatadir_+" -c "+ GlobalVar.snpeffconfig_ +" -nodownload ipd1060 "+self.ipdfinalvcf_+" > "+self.ipdfinalannotatedvcf_+" -noStats"
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
 
@@ -360,8 +360,8 @@ class IPDShortRead(object):
 		#counting the genes / pathogens
 		self.counting()
 		#perform assembly
-		self.assembly()
-		print("Assembly completed..")
+		#self.assembly()
+		#print("Assembly completed..")
 		#Alignment of assembled sequences / fasta
 		#self.tertiary_alignment()
 		#print("Tertiary alignment completed..")

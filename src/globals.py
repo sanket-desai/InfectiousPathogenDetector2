@@ -70,12 +70,15 @@ class GlobalVar(object):
 	tabix_="tabix"
 	lofreq_="lofreq"
 	snpeff_="snpEff"
+	freebayes_="freebayes"
 	#freebayes_="../external/freebayes/bin/freebayes"
 	freebayesparallel_="freebayes-parallel"
 	vcffilter_="vcffilter"
+	megahit_="megahit"
 	#Conda experimental end
 
 	snpeffdatadir_="./data"
+	snpeffconfig_="../data/snpEff/snpEff.config"
 	pathofa_="../data/primaryref/pathoref/patho.fa"
 	blastndb_="../data/secondaryref/secondary.fa" #give human + pathogen db name
 	primaryannotationtsv_="../data/annotation/primaryannotation.tsv"
@@ -99,12 +102,12 @@ class GlobalVar(object):
 
 	##cov2 module
 	hspathofa_="../data/primaryref/hspathoref/hspatho.fa"
-	cladestsv_="../data/cov2moduleref/clades.tsv"
-	subcladestsv_="../data/cov2moduleref/subclades.tsv"
+	cladestsv_="../data/cov2moduleref/clade.tsv"
+	subcladestsv_="../data/cov2moduleref/subclade.tsv"
 	tabvardatabase_="../data/cov2moduleref/representative_tabvar_20201231_sorted.tab.tsv.gz"
-	#vcfdatabasefile_="../data/cov2moduleref/gisaidmerged.vcf.gz"
-	#gisaidmetadatafile_="../data/cov2moduleref/gisaidmetadata.tsv"
-	#covblastndb_="../data/cov2moduleref/gisaid.fasta"
+	vcfdatabasefile_="../data/cov2moduleref/gisaidmerged.vcf.gz"
+	gisaidmetadatafile_="../data/cov2moduleref/gisaidmetadata.tsv"
+	covblastndb_="../data/cov2moduleref/gisaid.fasta"
 
 	@staticmethod
 	def initialize():

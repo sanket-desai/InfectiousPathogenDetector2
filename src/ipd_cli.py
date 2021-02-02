@@ -17,7 +17,11 @@ import pathlib
 #Directory and file check
 def file_choices(choices,fname):
 	ext = ''.join(pathlib.Path(fname).suffixes)
-	if ext.lower() not in choices:
+	fnamewrong=True
+	for c in choices:
+		if fname.endswith(c):
+			fnamewrong=False
+	if ext.lower() not in choices and fnamewrong:
 		print(ext)
 		raise argparse.ArgumentTypeError('File must have proper extension')
 	return fname

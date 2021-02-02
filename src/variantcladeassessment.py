@@ -19,7 +19,7 @@ import pandas as pd
 
 class TabvarRecord(object):
     def __init__(self, l):
-        si=l.strip().split(",")
+        si=l.strip().split("\t")
         if len(si) != 17:
             print(si)
             print("Format issue! Please check the tabvar file")
@@ -45,7 +45,7 @@ class TabvarRecord(object):
         return self.ref_+"_"+self.pos_+"_"+self.alt_
 
 class CladeTSVRecord(object):
-    def __int__(self, rec):
+    def __init__(self, rec):
         sl=rec.strip().split('\t')
         try:
             self.clade_=sl[0]
@@ -103,7 +103,7 @@ class CladeAssignment(object):
         #primary clade assignment
         #ctsvp=CladesTSVParser(GlobalVar.cladestsv_, True)
         try:
-            vf=pysam.VariantFile(vcffle)
+            vf=pysam.VariantFile(vcffile)
             while(1):
                 try:
                     vnext=next(vf)
@@ -122,7 +122,7 @@ class CladeAssignment(object):
         self.subcladetsvparser_obj_=CladesTSVParser(GlobalVar.subcladestsv_, False)
         #sctsvp=CladesTSVParser(GlobalVar.subcladestsv_, False)
         try:
-            vf=pysam.VariantFile(vcffle)
+            vf=pysam.VariantFile(vcffile)
             while(1):
                 try:
                     vnext=next(vf)
@@ -146,7 +146,7 @@ class CladeAssignment(object):
                 maxscoreclade=c
                 maxscore=self.clade_score_map_[c]
         #All clade defining variants match
-        if not maxscoreclade != '':
+        if not maxscoreclade == '':
             if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
                 maxscoreclade=''
         return maxscoreclade
@@ -158,46 +158,51 @@ class CladeAssignment(object):
                 maxscoreclade=c
                 maxscore=self.subclade_score_map_[c]
         #All clade defining variants match
-        if not maxscoreclade != '':
+        if not maxscoreclade == '':
             if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
                 maxscoreclade=''
         return maxscoreclade
 
 class VariantAssessment(object):
-    def __int__(self, vcffile):
+    def __init__(self, vcffile):
         self.number_of_variants_=0
         self.novel_variant_list_=[] # list of pysam variant objects which are not found in the database
         pysamvcf=pysam.VariantFile(vcffile)
         self.closest_gisaid_sample_map_={} # gisaid / EPI -> number of matching variants
+        tabfile=pysam.TabixFile(GlobalVar.tabvardatabase_)
         while(1):
             try:
                 isnovel=True
-                self.number_of_variants_+=1
                 vrec=next(pysamvcf)
                 chrom=vrec.chrom
-                if chrom.contains('.'):
-                    chrom=chrom[:chrom.find('.')]
-                query=chrom+":"+str(vrec.pos)+"-"+str(vrec.pos)
-                tabfile=TabixFile(GlobalVar.tabvardatabase_)
-                matchinggisaid=[]
-                for trec in tabfile.fetch(query):
-                    rtabvar=TabvarRecord(trec)
-                    #check if variants are same
-                    dkey=rtabvar.key()
-                    for al in vrec.alts:
-                        vkey=vrec.ref_+"_"+str(vrec.pos_)+"_"+al
-                        if vkey == dkey:
-                            isnovel=False
-                            if not rtabvar.gisaid_id_ in matchinggisaid:
-                                matchinggisaid.append(rtabvar.gisaid_id_)
+                if chrom.startswith("NC_045512"):
+                    if chrom.find('.')>0:
+                        chrom=chrom[:chrom.find('.')]
+                    self.number_of_variants_+=1
+                    query=chrom+":"+str(vrec.pos)+"-"+str(vrec.pos)
+                    matchinggisaid=[]
+                    for trec in tabfile.fetch(query):
+                        rtabvar=TabvarRecord(trec)
+                        #check if variants are same
+                        dkey=rtabvar.key()
+                        for al in vrec.alts:
+                            vkey=vrec.ref+"_"+str(vrec.pos)+"_"+al
+                            if vkey == dkey:
+                                isnovel=False
+                                if not rtabvar.gisaid_id_ in matchinggisaid:
+                                    matchinggisaid.append(rtabvar.gisaid_id_)
+                else:
+                    print("Ignored variant %s" %(chrom))
                 for m in matchinggisaid:
                     if not m in self.closest_gisaid_sample_map_:
                         self.closest_gisaid_sample_map_[m]=1
                     else:
                         self.closest_gisaid_sample_map_[m]=self.closest_gisaid_sample_map_[m]+1
                 if isnovel:
-                    self.novel_variant_list_.append(vrec)
+                    if vrec.chrom.startswith('NC_045512'):
+                        self.novel_variant_list_.append(vrec)
             except Exception as se:
+                print(se)
                 break
         self.closest_gisaid_number_of_variant_overlap_=0
         self.closest_gisaid_id_=''
@@ -226,11 +231,13 @@ class VariantCladeAssessment(object):
         self.novelvardf_=pd.DataFrame()
         self.cladedf_=pd.DataFrame()
         for sample in vcfmap:
+            vcffile=vcfmap[sample]
+            #print("Processing sample %s" %(sample))
             va=VariantAssessment(vcffile)
             ca=CladeAssignment(vcffile)
             if len(va.novel_variant_list_) > 0:
                 for n in va.novel_variant_list_:
-                    ann=r.info['ANN'][0].split('|')
+                    ann=n.info['ANN'][0].split('|')
                     alt=ann[0]
                     conseq=ann[1]
                     gene=ann[3]
@@ -238,9 +245,12 @@ class VariantCladeAssessment(object):
                     protein_change=ann[10]
                     nvrec=[ sample, n.chrom, str(n.pos), n.ref, alt, conseq, gene, transcript, protein_change]
                     novvararr.append(nvrec)
+            else:
+                print("No novel variants found!")
             #start filling clade line
             cnumvar=va.get_number_of_variants()
-            crelatedgisaid=va.closest_gisaid_sample()+ " (" + va.closest_gisaid_number_of_variant_overlap() +")"
+            print("Number of variants %d " %(cnumvar))
+            crelatedgisaid=va.closest_gisaid_sample()+ " (" + str(va.closest_gisaid_number_of_variant_overlap()) +")"
             cclade=ca.assigned_clade()
             csubclade=ca.assigned_subclade()
             cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade, csubclade])

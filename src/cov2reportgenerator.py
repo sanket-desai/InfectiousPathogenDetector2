@@ -33,7 +33,7 @@ class CustomError(Exception):
 class CoV2ReportGenerator(object):
 	def __init__(self, outdir=None):
 		if outdir:
-			#self.outdir=outdir
+			self.outdir=outdir
 			self.vcf_map={}
 			self.countfile_map={}
 			self.total_fragment_list=[]
@@ -74,13 +74,13 @@ class CoV2ReportGenerator(object):
 					vcf_sample=os.path.basename(vcf)
 					sample=vcf_sample.replace("_final_annotated.vcf","")
 					self.vcf_map[sample]=vcf
-			try:
-				#where clade assignment happens
-				self.varcladeassessmentobj_=VariantCladeAssessment(self.vcf_map)
-				#self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
-			except:
-				print("Clade assessment Object not created. Error!!")
-			#print(self.vcf_map)
+			#where clade assignment happens
+			print(self.vcf_map)
+			self.varcladeassessmentobj_=VariantCladeAssessment(self.vcf_map)
+			#self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
+		else:
+			print("Input directory %s not found!" %(outdir))
+			sys.exit(0)
 
 	def bam_summary_generation(self, bam=None):
 		summary_file=None
@@ -126,24 +126,21 @@ class CoV2ReportGenerator(object):
 		return coverage_out
 
 	def basic_stats_tabulation_for_file(self,file_name,sample):
-		if os.path.isfile(file_name):
-			sample=os.path.basename(sample)
-			#Minor change, addition of base name instead of complete path (Nov,5 2020, sanket)
-			data=open(file_name,'r')
-			Pandasobj=pd.read_csv(file_name,skiprows=5,sep="\t",engine='python',header=1)
-			PandasDf=pd.DataFrame(data=Pandasobj)
-			col = ['TOTAL_READS','PF_READS_ALIGNED','PCT_PF_READS_ALIGNED','MEAN_READ_LENGTH']
-			if PandasDf["CATEGORY"].shape[0] == 3:
-				PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "FIRST_OF_PAIR"]
-				PandasDf=PandasDf.rename(index={2:0})
-			elif PandasDf['CATEGORY'].shape[0] == 1:
-				PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "UNPAIRED"]
-			df = pd.DataFrame(PandasDf, columns=col)
-			df['Percent_Aligned_Reads']=df['PCT_PF_READS_ALIGNED']*100
-			df=df.drop(['PCT_PF_READS_ALIGNED'],axis=1)
-			df=df.rename(columns={"TOTAL_READS":"Total_Reads","PF_READS_ALIGNED":"Aligned_Reads","Percent_Aligned_Reads":"Percent_Aligned_Reads","MEAN_READ_LENGTH":"Mean_Read_Length"})
-			df=df[["Total_Reads","Aligned_Reads","Percent_Aligned_Reads","Mean_Read_Length"]]
-			df_t = pd.DataFrame.transpose(df).rename(columns={0:sample})
+		data=open(file_name,'r')
+		Pandasobj=pd.read_csv(file_name,skiprows=5,nrows=3,sep="\t",engine='python',header=1)
+		PandasDf=pd.DataFrame(data=Pandasobj)
+		col = ['TOTAL_READS','PF_READS_ALIGNED','PCT_PF_READS_ALIGNED','MEAN_READ_LENGTH']
+		if PandasDf["CATEGORY"].shape[0] == 3:  
+			PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "FIRST_OF_PAIR"]
+			PandasDf=PandasDf.rename(index={2:0})
+		elif PandasDf['CATEGORY'].shape[0] == 1:
+			PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "UNPAIRED"]
+		df = pd.DataFrame(PandasDf, columns=col)
+		df['Percent_Aligned_Reads']=df['PCT_PF_READS_ALIGNED']*100
+		df=df.drop(['PCT_PF_READS_ALIGNED'],axis=1)
+		df=df.rename(columns={"TOTAL_READS":"Total_Reads","PF_READS_ALIGNED":"Aligned_Reads","Percent_Aligned_Reads":"Percent_Aligned_Reads","MEAN_READ_LENGTH":"Mean_Read_Length"})
+		df=df[["Total_Reads","Aligned_Reads","Percent_Aligned_Reads","Mean_Read_Length"]]
+		df_t = pd.DataFrame.transpose(df).rename(columns={0:os.path.basename(sample)})
 		return df_t
 
 	def get_basic_stats_tabulation_for_the_batch(self):
@@ -192,7 +189,7 @@ class CoV2ReportGenerator(object):
 				plt.title(title_var, loc='center')
 				plt.savefig(os.path.join(self.outdir,sample+"_coverage.png"))
 				plt.close(fig=None)
-				image_file_list.append(os.path.join(self.cov2outdir,sample+"_coverage.png"))
+				image_file_list.append(os.path.abspath(os.path.join(self.outdir,os.path.basename(sample)+"_coverage.png")))
 				print(str(sample)+"\t"+str(median),file=coverage_out)
 		print("Coverage output generated!!!")
 		return image_file_list
@@ -241,13 +238,14 @@ class CoV2ReportGenerator(object):
 		log2FPKM=CoV2_fpkm_log2
 		#print(sample,log2FPKM)
 		sample_pos = [i for i, _ in enumerate(sample)]
-		fpkm_plot_file=os.path.join(self.cov2outdir,'CoV2_FPKM.png')
-		plt.bar(sample_pos, log2FPKM, color='red', width=10)
+		fpkm_plot_file=os.path.abspath(os.path.join(self.cov2outdir,'CoV2_FPKM.png'))
+		plt.bar(sample_pos, log2FPKM, color='red', width=1)
 		plt.xlabel('')
 		plt.ylabel('CoV2 log2 FPKM')
 		plt.title("SARS-CoV-2 quantification (FPKM)")
-		plt.xticks(sample_pos, sample, rotation=30)
-		plt.savefig(fpkm_plot_file, bbox_inches = 'tight', pad_inches = 0)
+		plt.xticks(sample_pos, sample, rotation=90)
+		plt.savefig(fpkm_plot_file, bbox_inches = 'tight', pad_inches = 0.1)
+		#plt.savefig(fpkm_plot_file, bbox_inches = 'tight')
 		plt.close(fig=None)
 
 		print("FPKM plot is generated")
@@ -264,20 +262,21 @@ class CoV2ReportGenerator(object):
 		#print(Human)
 		#print(Pathogen)
 		#print(Unaligned)
-		plt.bar(ind, Unaligned, width=0.8, label='Unaligned', color='blue', bottom=Human + Pathogen+ CoV2)
-		plt.bar(ind, Human, width=0.8, label='Human', color='green', bottom=Pathogen + CoV2)
-		plt.bar(ind, Pathogen, width=0.8, label='Pathogen', color='yellow', bottom=CoV2)
-		plt.bar(ind, CoV2, width=0.8, label='CoV2', color='red')
+		plt.bar(ind, Unaligned, width=0.5, label='Unaligned', color='blue', bottom=Human + Pathogen+ CoV2)
+		plt.bar(ind, Human, width=0.5, label='Human', color='green', bottom=Pathogen + CoV2)
+		plt.bar(ind, Pathogen, width=0.5, label='Pathogen', color='yellow', bottom=CoV2)
+		plt.bar(ind, CoV2, width=0.5, label='CoV2', color='red')
 
-		stack_plot_file=os.path.join(self.cov2outdir,'Samples_stackbar.png')
-		plt.xticks(ind, Sample, rotation = 10)
+		stack_plot_file=os.path.abspath(os.path.join(self.cov2outdir,'Samples_stackbar.png'))
+		plt.xticks(ind, Sample, rotation = 90)
 		plt.ylabel("Relative Composition")
 		plt.xlabel("")
 		plt.legend(loc="upper right")
 		plt.title("Sample Composition")
-		plt.savefig(stack_plot_file)
+		plt.savefig(stack_plot_file, bbox_inches = 'tight', pad_inches = 0.1)
 		plt.close(fig=None)
 
+		print("Abundance stack plot is generated!")
 		print("Abundance stack plot is generated!")
 
 		image_file_list=[fpkm_plot_file,stack_plot_file]
@@ -288,8 +287,10 @@ class CoV2ReportGenerator(object):
 		try:
 			#clade_df=self.clade_assessment_obj.get_pandas_df_clade_assessment()
 			clade_df=self.varcladeassessmentobj_.get_clade_assessment_data_frame()
-		except:
+		except Exception as e:
+			print(e)
 			print("Error in Clade Assessment")
+			sys.exit(0)
 		cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
 		clade_df.to_csv(cov2_clade_out)
 
@@ -344,10 +345,9 @@ def main():
 		header2 = markdown("###**Coverage Plot**")
 		output_file.write(header2)
 
-
 		if len(cov_plot_list) > 2:
 			for i,k in zip(cov_plot_list[0::2], cov_plot_list[1::2]):
-				image="![]("+i+") | ![]("+k+")"
+				image="![]("+i+") ![]("+k+")"
 				html_image = markdown(image)
 				output_file.write(html_image)
 		elif len(cov_plot_list) == 1:
@@ -355,14 +355,20 @@ def main():
 			html_image = markdown(image)
 			output_file.write(html_image)
 
-
-		image2="![]("+ab_plot_list[0]+") | ![]("+ab_plot_list[1]+")"
+		#Commented to reason the image placement error
+		#image2="![]("+ab_plot_list[0]+")
+        #image2=![]("+ab_plot_list[1]+")"
+		image2="![]("+ab_plot_list[0]+")"
+		image0="![]("+ab_plot_list[1]+")"
 
 		header3 = markdown("###**Relative Abundance**")
 		output_file.write(header3)
 
 		html_image2 = markdown(image2)
 		output_file.write(html_image2)
+		#Added for testing
+		html_image0 = markdown(image0)
+		output_file.write(html_image0)
 
 		header6 = markdown("###**Novel Variants**")
 		output_file.write(header6)
@@ -391,3 +397,4 @@ def main():
 		cprocess.check_returncode()
 if __name__ =="__main__":
 		main()
+
