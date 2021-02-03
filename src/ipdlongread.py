@@ -225,18 +225,15 @@ class IPDLongRead(object):
         #cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         #cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         #cprocess.check_returncode()
-
         cmd=GlobalVar.bgzip_+" "+self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         cmd=GlobalVar.bcftools_+" index "+self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf.gz")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-
         cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  --min-repeat-entropy 1 --haplotype-length 500 --haplotype-basis-alleles "+ self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf.gz")+" "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20 & DP > 5 & AF > 0.5\" > "  +self.primarysortedbam_.replace(".bam","_freebayes.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-
         cmd=GlobalVar.bgzip_+" "+self.primarysortedbam_.replace(".bam","_medaka.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
@@ -272,7 +269,6 @@ class IPDLongRead(object):
         cmd=GlobalVar.bcftools_+" index "+ self.primarysortedbam_.replace(".bam","_sr.vcf.gz")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-
         #common between consensus and medaka
         cmd=GlobalVar.bcftools_+" isec -n +2 -o "+self.ipdfinalvcf_+" "+self.primarysortedbam_.replace(".bam","_sr.vcf.gz ")+ self.primarysortedbam_.replace(".bam","_medaka.vcf.gz -f PASS -O v -w 2")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
@@ -282,14 +278,12 @@ class IPDLongRead(object):
         #Commented only to be run on Param / otherwise uncomment this and RUN
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-
     def counting_process(self):
         #self.primarysamfilehandle_.close()
         #self.assemblyfastqinput1filehandle_.close()
         self.featurecountsoutputfile_=self.primarycountbam_.replace(".bam", "_featurecounts.tsv")
         self.ipdfinalcountsfile_=self.primarycountbam_.replace(".bam", "_finalcounts.tsv")
         self.counting()
-
     def filtration(self):
         chopped=self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_chopped"+self.inputr1_extn_
         cmd=GlobalVar.porechop_+" -i "+ self.inputmap_['r1'] +" -o "+ chopped
