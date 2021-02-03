@@ -162,7 +162,7 @@ class CladeAssignment(object):
                 maxscore=self.subclade_score_map_[c]
         #All clade defining variants match
         if not maxscoreclade == '':
-            self.subclade_assignment_prob_ = maxscore / self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
+            self.subclade_assignment_prob_ = maxscore / self.subcladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
             #if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
             #    maxscoreclade=''
         return maxscoreclade
