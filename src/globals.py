@@ -145,7 +145,7 @@ class GlobalVar(object):
 		if not os.path.isfile(GlobalVar.primaryannotationtsv_):
 			raise GlobalVarException("Annotation file not found in the defined path: %s" % GlobalVar.primaryannotationtsv_ )
 		if not os.path.isfile(GlobalVar.secondaryannotationtsv_):
-			raise GlobalVarException("Annotation file not found in the defined path: %s" % GlobalVar.secondaryan )
+			raise GlobalVarException("Annotation file not found in the defined path: %s" % GlobalVar.secondaryannotationtsv_)
 		if not os.path.isfile(GlobalVar.hspathogff_):
 			raise GlobalVarException("Human-pathogen GFF file not found in the defined path: %s" % GlobalVar.hspathogff_ )
 		#if not os.path.isfile(GlobalVar.hisat2hspathoindex_+".1.ht2l"):
