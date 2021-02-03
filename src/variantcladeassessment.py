@@ -95,6 +95,8 @@ class CladesTSVParser(object):
 
 class CladeAssignment(object):
     def __init__(self, vcffile):
+        self.clade_assignment_prob_=0
+        self.subclade_assignment_prob_=0
         self.clade_score_map_={}
         self.subclade_score_map_={}
         #stores the clade -> number of clade supporting variants found in vcf
@@ -147,8 +149,9 @@ class CladeAssignment(object):
                 maxscore=self.clade_score_map_[c]
         #All clade defining variants match
         if not maxscoreclade == '':
-            if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
-                maxscoreclade=''
+            self.clade_assignment_prob_= maxscore / self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
+            #if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
+            #    maxscoreclade=''
         return maxscoreclade
     def assigned_subclade(self):
         maxscoreclade=''
@@ -159,10 +162,14 @@ class CladeAssignment(object):
                 maxscore=self.subclade_score_map_[c]
         #All clade defining variants match
         if not maxscoreclade == '':
-            if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
-                maxscoreclade=''
+            self.subclade_assignment_prob_ = maxscore / self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
+            #if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
+            #    maxscoreclade=''
         return maxscoreclade
-
+    def assigned_clade_probability(self):
+        return self.clade_assignment_prob_
+    def assigned_subclade_probablility(self):
+        return self.subclade_assignment_prob_
 class VariantAssessment(object):
     def __init__(self, vcffile):
         self.number_of_variants_=0
@@ -253,7 +260,9 @@ class VariantCladeAssessment(object):
             crelatedgisaid=va.closest_gisaid_sample()+ " (" + str(va.closest_gisaid_number_of_variant_overlap()) +")"
             cclade=ca.assigned_clade()
             csubclade=ca.assigned_subclade()
-            cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade, csubclade])
+            ccladeprob= '%.2f' % ca.assigned_clade_probability()
+            csubcladeprob= '%.2f' % ca.assigned_subclade_probablility()
+            cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade+"("+ccladeprob+")", csubclade+"("+csubcladeprob+")" ])
         if len(novvararr)>0:
             self.novelvardf_ = pd.DataFrame(novvararr, columns = novdfcol)
         else:
