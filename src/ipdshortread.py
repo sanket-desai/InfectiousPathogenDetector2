@@ -348,7 +348,7 @@ class IPDShortRead(object):
 		cmd=GlobalVar.bcftools_+" index "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_lofreq_varscan_isec.vcf.gz "
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
-		cmd=GlobalVar.bcftools_+" merge -o "+self.ipdfinalvcf_+" "+ self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_lofreq_varscan_isec.vcf.gz "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf.gz -f PASS -O v"
+		cmd=GlobalVar.bcftools_+" isec -n +1 -o "+self.ipdfinalvcf_+" "+ self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_lofreq_varscan_isec.vcf.gz "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf.gz -f PASS -O v -w 2"
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
 
