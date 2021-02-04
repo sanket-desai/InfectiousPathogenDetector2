@@ -207,7 +207,7 @@ class IPDLongRead(object):
         cmd=GlobalVar.samtools_+" mpileup -q 1 -f "+GlobalVar.pathofa_+" -o "+self.primarysortedbam_.replace(".bam",".mpileup ")+self.primarysortedbam_
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-        cmd=GlobalVar.varscan_+" mpileup2cns "+self.primarysortedbam_.replace(".bam",".mpileup")+" --output-vcf 1 --variants > "+self.primarysortedbam_.replace(".bam","_varscan.vcf")
+        cmd=GlobalVar.varscan_+" mpileup2cns "+self.primarysortedbam_.replace(".bam",".mpileup")+" --min-coverage 5 --output-vcf 1 --variants > "+self.primarysortedbam_.replace(".bam","_varscan.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         cmd=GlobalVar.lofreq_+" call -f "+GlobalVar.pathofa_+" -o "+self.primarysortedbam_.replace(".bam","_lofreq1.vcf")+" "+self.primarysortedbam_
@@ -259,7 +259,7 @@ class IPDLongRead(object):
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         #consensus call - sr.vcf
-        cmd=GlobalVar.bcftools_+" isec -n +2 -o "+self.primarysortedbam_.replace(".bam","_sr.vcf.gz")+" "+ self.primarysortedbam_.replace(".bam","_lofreq.vcf.gz ")+ self.primarysortedbam_.replace(".bam","_varscan.vcf.gz ")+self.primarysortedbam_.replace(".bam","_freebayes.vcf.gz -f PASS -O z -w 2")
+        cmd=GlobalVar.bcftools_+" merge --merge all -o "+self.primarysortedbam_.replace(".bam","_sr.vcf.gz")+" "+ self.primarysortedbam_.replace(".bam","_lofreq.vcf.gz ")+ self.primarysortedbam_.replace(".bam","_varscan.vcf.gz ")+self.primarysortedbam_.replace(".bam","_freebayes.vcf.gz -O z")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         #Filter with DP 10 and
