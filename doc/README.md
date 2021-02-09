@@ -96,36 +96,6 @@ $ python3 ipd_cli.py short -p <project name> -t <number of threads default 4> -o
 
 ![cli_shortread](cli_shortread.png)
 
-### Guide to use GUI of IPD 2.0
-
-IPD 2.0 graphical user interface is developed for the analysis of both long and short read to detect the abundance of pathogen and variants present in them. GUI code is kept in src, following command is used to access the same.
-
-```
-$python3 ipd_gui.py
-```
-
-![gui_basic](gui_basic.png)
-
-It has both multi-sample and single sample run mode. For Multi-sample run mode, user need to provide a sample info file. Sample name and Project name will be used as prefix for all the output files.  
-
-**Example Sample File format for paired-end data:**
-
-SampleName <tab> testfile_r1.fastq.gz <tab> testfile_r2.fastq.gz
-
-**Example Sample File format for single-end data:**
-
-SampleName <tab> testfile_r1.fastq.gz
-
-![gui_multisample](gui_multisample.png)
-
-For Single sample run mode there is further two options for the data type, paired-end and single-end. It enables the user to browse the fastq/fastq.gz input files. Project name will be used as the prefix for all the output files in this case.
-
-![gui_single_ps](gui_single_ps.png)
-
-![gui_single_ss](gui_single_ss.png)
-
-
-
 ### SARS-CoV2 report generation
 
 SARS-Cov2 report generation script enables to user to visualize the coverage and expression of SARS-CoV2 in the sample. Further it provides a detailed summary of the reads, and assign clades based on the SARS-CoV2 variant profile. It required the output directory post IPD run. The code accesses the required files and generate a HTML report in the same output directory as Output.html (Refer Page 6 of 6 for sample IPD report)
