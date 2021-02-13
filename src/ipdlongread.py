@@ -218,7 +218,7 @@ class IPDLongRead(object):
         cprocess=subprocess.run(cmd, shell=True)
         cprocess.check_returncode()
         #freebayes two-pass variant calling
-        cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.preprocessedpathogenbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
+        cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
         cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
         cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_r1.vcf"
