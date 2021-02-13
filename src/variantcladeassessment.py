@@ -266,7 +266,7 @@ class VariantCladeAssessment(object):
         if len(novvararr)>0:
             self.novelvardf_ = pd.DataFrame(novvararr, columns = novdfcol)
         else:
-            self.novelvardf_= pd.DataFrame([ [str(sample),"","","","","","","",""] ], columns= novdfcol)
+            self.novelvardf_= pd.DataFrame([ ["","","","","","","","",""] ], columns= novdfcol)
         self.cladedf_ = pd.DataFrame(cladesarr, columns = cladedfcol)
         #xxxxxxxxxx
     def get_novel_variant_data_frame(self):
