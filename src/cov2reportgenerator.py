@@ -130,7 +130,7 @@ class CoV2ReportGenerator(object):
 		Pandasobj=pd.read_csv(file_name,skiprows=5,nrows=3,sep="\t",engine='python',header=1)
 		PandasDf=pd.DataFrame(data=Pandasobj)
 		col = ['TOTAL_READS','PF_READS_ALIGNED','PCT_PF_READS_ALIGNED','MEAN_READ_LENGTH']
-		if PandasDf["CATEGORY"].shape[0] == 3:  
+		if PandasDf["CATEGORY"].shape[0] == 3:
 			PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "FIRST_OF_PAIR"]
 			PandasDf=PandasDf.rename(index={2:0})
 		elif PandasDf['CATEGORY'].shape[0] == 1:
@@ -397,4 +397,3 @@ def main():
 		cprocess.check_returncode()
 if __name__ =="__main__":
 		main()
-
