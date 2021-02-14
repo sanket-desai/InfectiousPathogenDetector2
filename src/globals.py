@@ -72,7 +72,10 @@ class GlobalVar(object):
 	featurecounts_="featureCounts"
 	samtools_="samtools"
 	#megahit_="../external/MEGAHIT-1.2.9-Linux-x86_64-static/bin/megahit"
-	picard_="java -Xmx10G -jar "+picardjar_
+	if picardjar_=="":
+		picard_ = "picard"
+	else:
+		picard_="java -Xmx10G -jar "+picardjar_
 	bcftools_="bcftools"
 	varscan_="varscan"
 	bgzip_="bgzip"

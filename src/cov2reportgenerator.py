@@ -32,6 +32,7 @@ class CustomError(Exception):
 		return repr(self.value)
 class CoV2ReportGenerator(object):
 	def __init__(self, outdir=None):
+		GlobalVar.initialize()
 		if outdir:
 			self.outdir=outdir
 			self.vcf_map={}
