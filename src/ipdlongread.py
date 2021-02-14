@@ -221,7 +221,7 @@ class IPDLongRead(object):
         cmd=GlobalVar.freebayesparallel_+" <(fasta_generate_regions.py "+ GlobalVar.pathofa_+".fai 50000) "+ str(self.inputmap_['threads']) +" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_ +" > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf"
         cprocess=subprocess.run( "/bin/bash -c \""+cmd+" \"", shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
-        cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_r1.vcf"
+        cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         #cmd=GlobalVar.freebayes_+" -f "+GlobalVar.pathofa_+"  "+self.primarysortedbam_+" | "+ GlobalVar.vcffilter_+" -f \"QUAL > 20\" > "  +self.primarysortedbam_.replace(".bam","_freebayes_r1.vcf")
         cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         cprocess.check_returncode()
