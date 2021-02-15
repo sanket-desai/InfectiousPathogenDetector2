@@ -182,6 +182,8 @@ class CoV2ReportGenerator(object):
 				axes.set_ylim([0,500])
 
 				median=np.median(y)
+				ss=sample.split("/")
+				sample=ss[len(ss)-1]
 				#base name obtained - change Nov 5,2020 - Sanket
 				title_var= os.path.basename(sample)+" (Median Coverage = "+str(median)+" )"
 				plt.plot(x,y,color="grey")
