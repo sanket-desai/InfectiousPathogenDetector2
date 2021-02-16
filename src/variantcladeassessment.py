@@ -226,22 +226,60 @@ class VariantAssessment(object):
     def get_number_of_variants(self):
         return self.number_of_variants_
 
+cladd GisaidCladeTSVRecord(object):
+    def __init__(self, rec):
+        srec=rec.split("\t")
+        self.parentclade_=""
+        self.clade_=""
+        self.id_=""
+        self.name_=""
+        self.gisaidnumber_=0
+        self.date_=""
+        if len(srec) < 2:
+            raise GlobalFormatException("GISAID Clade TSV format error for record: %s" %(rec.strip()))
+        else:
+            self.clade_ = srec[1]
+            ssrec=srec[0].split("|")
+            if len(ssrec) == 3:
+                self.name_=ssrec[0]
+                self.id_=ssrec[1]
+                self.date_=ssrec[2]
+            else:
+                raise GlobalFormatException("GISAID Clade TSV format error for record: %s" %(rec.strip()))
+            self.gisaidnumber_=int(self.id_.split('_')[2])
+
+class GisaidCladeTSVParser(object):
+    def __init__(self):
+        gctsv=open(GlobalVar.gisaidcladestsv_)
+        self.header_=gctsv.readline().strip()
+        self.gisaidnumber_record_map_={} #store GISAID number; ex 736498 for ID EPI_ISL_736498 -> GisaidCladeTSVRecord
+        for g in gctsv:
+            grec=GisaidCladeTSVRecord(g.strip())
+            self.gisaidnumber_record_map_[grec.gisaidnumber_]=grec
+    def get_clade(self, ginum):
+        gr=self.gisaidnumber_record_map_[ginum]
+        return gr.gisaidnumber_
+    def get_parentclade(self, ginum):
+        gr=self.gisaidnumber_record_map_[ginum]
+        return gr.parentclade_
+
 #A wrapper class to perform both variant check and clade assignment and tabulate in panda frame
 class VariantCladeAssessment(object):
     def __init__(self, vcfmap): # , outdir): #{ samplename->vcffile path }
     #self.cov2outdir=os.path.join(self.outdir, "cov2output")
         data=[] #array of array each line. Fill and then give to dataFrame function
         novdfcol=["Sample","Genome","Position","Reference","Altered","Consequence","Gene","Transcript","Protein Change"]
-        cladedfcol=["Sample","Number of variants", "Related GISAID genome", "Clade", "Subclade"]
+        cladedfcol=["Sample","Number of variants", "Related GISAID genome", "Clade"]
         novvararr=[]
         cladesarr=[]
         self.novelvardf_=pd.DataFrame()
         self.cladedf_=pd.DataFrame()
+        gisaidcladetsvpar=GisaidCladeTSVParser()
         for sample in vcfmap:
             vcffile=vcfmap[sample]
             #print("Processing sample %s" %(sample))
             va=VariantAssessment(vcffile)
-            ca=CladeAssignment(vcffile)
+            #ca=CladeAssignment(vcffile)
             if len(va.novel_variant_list_) > 0:
                 for n in va.novel_variant_list_:
                     ann=n.info['ANN'][0].split('|')
@@ -258,11 +296,18 @@ class VariantCladeAssessment(object):
             cnumvar=va.get_number_of_variants()
             print("Number of variants %d " %(cnumvar))
             crelatedgisaid=va.closest_gisaid_sample()+ " (" + str(va.closest_gisaid_number_of_variant_overlap()) +")"
-            cclade=ca.assigned_clade()
-            csubclade=ca.assigned_subclade()
-            ccladeprob= '%.2f' % ca.assigned_clade_probability()
-            csubcladeprob= '%.2f' % ca.assigned_subclade_probablility()
-            cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade+"("+ccladeprob+")", csubclade+"("+csubcladeprob+")" ])
+            #cclade=ca.assigned_clade()
+            #csubclade=ca.assigned_subclade()
+            #ccladeprob= '%.2f' % ca.assigned_clade_probability()
+            #csubcladeprob= '%.2f' % ca.assigned_subclade_probablility()
+            #cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade+"("+ccladeprob+")" ])
+            cclade=""
+            if crelatedgisaid != "":
+                cg=crelatedgisaid.split('-')
+                cginum=int(cg[2])
+                cclade=gisaidcladetsvpar.get_clade(cginum)
+            cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade ])
+            print("######## Sample : %s ; Related GISAID sample: %s ; Clade : %s" %(sample, crelatedgisaid, cclade))
         if len(novvararr)>0:
             self.novelvardf_ = pd.DataFrame(novvararr, columns = novdfcol)
         else:

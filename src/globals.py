@@ -114,6 +114,7 @@ class GlobalVar(object):
 
 	##cov2 module
 	hspathofa_="../data/primaryref/hspathoref/hspatho.fa"
+	gisaidcladestsv_="../data/cov2moduleref/gisaid_hcov_clades.tsv"
 	cladestsv_="../data/cov2moduleref/clades.tsv"
 	subcladestsv_="../data/cov2moduleref/subclades.tsv"
 	tabvardatabase_="../data/cov2moduleref/representative_tabvar_20201231_sorted.tab.tsv.gz"
