@@ -226,7 +226,7 @@ class VariantAssessment(object):
     def get_number_of_variants(self):
         return self.number_of_variants_
 
-cladd GisaidCladeTSVRecord(object):
+class GisaidCladeTSVRecord(object):
     def __init__(self, rec):
         srec=rec.split("\t")
         self.parentclade_=""
@@ -258,7 +258,7 @@ class GisaidCladeTSVParser(object):
             self.gisaidnumber_record_map_[grec.gisaidnumber_]=grec
     def get_clade(self, ginum):
         gr=self.gisaidnumber_record_map_[ginum]
-        return gr.gisaidnumber_
+        return gr.clade_
     def get_parentclade(self, ginum):
         gr=self.gisaidnumber_record_map_[ginum]
         return gr.parentclade_
@@ -302,8 +302,8 @@ class VariantCladeAssessment(object):
             #csubcladeprob= '%.2f' % ca.assigned_subclade_probablility()
             #cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade+"("+ccladeprob+")" ])
             cclade=""
-            if crelatedgisaid != "":
-                cg=crelatedgisaid.split('-')
+            if va.closest_gisaid_sample() != "":
+                cg=va.closest_gisaid_sample().split('-')
                 cginum=int(cg[2])
                 cclade=gisaidcladetsvpar.get_clade(cginum)
             cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade ])

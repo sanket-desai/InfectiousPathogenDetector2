@@ -169,7 +169,8 @@ class CoV2ReportGenerator(object):
 	def get_coverage_plot(self):
 		image_file_list=[]
 		coverage_out=None
-		coverage_out=open(os.path.join(self.cov2outdir,"cov2_coverage_compilation.csv"),'a+',encoding='UTF-8')
+		#coverage_out=open(os.path.join(self.cov2outdir,"cov2_coverage_compilation.csv"),'a+',encoding='UTF-8')
+		coverage_out=open(os.path.join(self.cov2outdir+"cov2_coverage_compilation.csv",'a+',encoding='UTF-8')
 		for sample in self.coverage_map:
 			if self.coverage_map[sample]:
 				x = []
@@ -325,6 +326,8 @@ def main():
 		sys.exit(0)
 	args=parser.parse_args()
 	outdir=args.inputdir
+	if not outdir.endswith("/"):
+		outdir = outdir +"/"
 	if os.path.exists(outdir):
 		obj=CoV2ReportGenerator(outdir)
 		out_file=obj.get_basic_stats_tabulation_for_the_batch()
@@ -332,8 +335,8 @@ def main():
 		ab_plot_list=obj.get_abundance_plot()
 		clade_df=obj.get_clade_assessment()
 		novel_variant_df=obj.get_novel_variant()
-		cov2outdir=os.path.join(outdir, "cov2output")
-		output_file = open(os.path.join(cov2outdir,"Output.html"), "w", encoding="utf-8", errors="xmlcharrefreplace")
+		cov2outdir=outdir+"cov2output/"
+		output_file = open(cov2outdir+"Output.html", "w", encoding="utf-8", errors="xmlcharrefreplace")
 
 		header=markdown("#**IPD REPORT**")
 		output_file.write(header)
@@ -395,7 +398,7 @@ def main():
 		#import pdfkit
 		#pdfkit.from_file(os.path.join(cov2outdir,"Output.html"), os.path.join(cov2outdir,"OutputReport.pdf"))
 		#2.0 uses wkhtmltopdf
-		cmd= "wkhtmltopdf " + os.path.join(cov2outdir,"Output.html ") +os.path.join(cov2outdir,"OutputReport.pdf")
+		cmd= "wkhtmltopdf " + cov2outdir+"Output.html " +cov2outdir+"OutputReport.pdf"
 		cprocess=subprocess.run(cmd, shell=True)
 		cprocess.check_returncode()
 if __name__ =="__main__":
