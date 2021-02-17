@@ -312,13 +312,13 @@ class IPDShortRead(object):
 		cmd=GlobalVar.vcffilter_+" -f \"QUAL > 20\" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes_minusone.vcf > "  +self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf"
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
-		cmd=GlobalVar.lofreq_+" call -f "+GlobalVar.pathofa_+" -o "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_lofreq.vcf "+self.preprocessedpathogenbam_
+		cmd=GlobalVar.lofreq_+" call-parallel --pp-threads "+ str(self.inputmap_['threads']) +" --minCov 5 -f "+GlobalVar.pathofa_+" -o "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_lofreq.vcf "+self.preprocessedpathogenbam_
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
 		cmd=GlobalVar.samtools_+" mpileup -q 1 -f "+GlobalVar.pathofa_+" -o "+ self.preprocessedpathogenbam_.replace(".bam",".mpileup")+" "+self.preprocessedpathogenbam_
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
-		cmd=GlobalVar.varscan_+" mpileup2cns "+self.preprocessedpathogenbam_.replace(".bam",".mpileup")+" --output-vcf 1 --variants > "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_varscan.vcf"
+		cmd=GlobalVar.varscan_+" mpileup2cns "+self.preprocessedpathogenbam_.replace(".bam",".mpileup")+" --min-coverage 5 --output-vcf 1 --variants > "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_varscan.vcf"
 		cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 		cprocess.check_returncode()
 		cmd=GlobalVar.bgzip_+" "+self.inputmap_['outdir']+self.inputmap_['prefix']+"_"+self.samplebasename_+"_freebayes.vcf"
