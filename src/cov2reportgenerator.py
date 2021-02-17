@@ -41,7 +41,7 @@ class CoV2ReportGenerator(object):
 			self.coverage_map={}
 			self.summaryout_map={}
 			self.contig_map={}
-			self.cov2outdir=os.path.join(outdir, "cov2output")
+			self.cov2outdir=outdir+"cov2output/"
 			if not os.path.exists(self.cov2outdir):
 				os.mkdir(self.cov2outdir)
 			for file in os.listdir(self.outdir):
@@ -55,7 +55,6 @@ class CoV2ReportGenerator(object):
 					coverage_file_out=self.bam_coverage(bam)
 					if coverage_file_out:
 						self.coverage_map[sample]=coverage_file_out
-
 				if file.endswith("_finalcounts.tsv"):
 					countfile=os.path.join(self.outdir, file)
 					countfile_sample=os.path.basename(countfile)
@@ -158,7 +157,7 @@ class CoV2ReportGenerator(object):
 				else:
 					all_sample_df = all_sample_df.merge(temp_df, left_index=True, right_index=True)
 				cnt=cnt+1
-		output_file=os.path.join(self.cov2outdir,"Basic_stats_summary.csv")
+		output_file=self.cov2outdir+"Basic_stats_summary.csv"
 		all_sample_df.to_csv(output_file)
 		if os.path.isfile(output_file):
 			print("Basic Stats summary tabulation generated!")
@@ -170,7 +169,7 @@ class CoV2ReportGenerator(object):
 		image_file_list=[]
 		coverage_out=None
 		#coverage_out=open(os.path.join(self.cov2outdir,"cov2_coverage_compilation.csv"),'a+',encoding='UTF-8')
-		coverage_out=open(os.path.join(self.cov2outdir+"cov2_coverage_compilation.csv",'a+',encoding='UTF-8')
+		coverage_out=open(self.cov2outdir+"cov2_coverage_compilation.csv",'a+',encoding='UTF-8')
 		for sample in self.coverage_map:
 			if self.coverage_map[sample]:
 				x = []
@@ -186,14 +185,14 @@ class CoV2ReportGenerator(object):
 				ss=sample.split("/")
 				sample=ss[len(ss)-1]
 				#base name obtained - change Nov 5,2020 - Sanket
-				title_var= os.path.basename(sample)+" (Median Coverage = "+str(median)+" )"
+				title_var= sample+" (Median Coverage = "+str(median)+" )"
 				plt.plot(x,y,color="grey")
 				plt.xlabel('Position in SARS CoV2 Genome')
 				plt.ylabel('Depth of Coverage')
 				plt.title(title_var, loc='center')
-				plt.savefig(os.path.join(self.outdir,sample+"_coverage.png"))
+				plt.savefig(self.cov2outdir+sample+"_coverage.png"))
 				plt.close(fig=None)
-				image_file_list.append(os.path.abspath(os.path.join(self.outdir,os.path.basename(sample)+"_coverage.png")))
+				image_file_list.append(self.cov2outdir+sample+"_coverage.png")
 				print(str(sample)+"\t"+str(median),file=coverage_out)
 		print("Coverage output generated!!!")
 		return image_file_list
@@ -206,7 +205,7 @@ class CoV2ReportGenerator(object):
 		pathogen_all=[]
 		sample_list=[]
 		image_file_list=[]
-		cov2_fpkm_out=open(os.path.join(self.cov2outdir,"cov2_fpkm_compilation.csv"),'a+',encoding='UTF-8')
+		cov2_fpkm_out=open(self.cov2outdir+"cov2_fpkm_compilation.csv",'a+',encoding='UTF-8')
 		for sample in self.countfile_map:
 			file=self.countfile_map[sample]
 			data=open(file,'r')
@@ -242,7 +241,7 @@ class CoV2ReportGenerator(object):
 		log2FPKM=CoV2_fpkm_log2
 		#print(sample,log2FPKM)
 		sample_pos = [i for i, _ in enumerate(sample)]
-		fpkm_plot_file=os.path.abspath(os.path.join(self.cov2outdir,'CoV2_FPKM.png'))
+		fpkm_plot_file=self.cov2outdir+'CoV2_FPKM.png'
 		plt.bar(sample_pos, log2FPKM, color='red', width=1)
 		plt.xlabel('')
 		plt.ylabel('CoV2 log2 FPKM')
@@ -271,7 +270,7 @@ class CoV2ReportGenerator(object):
 		plt.bar(ind, Pathogen, width=0.5, label='Pathogen', color='yellow', bottom=CoV2)
 		plt.bar(ind, CoV2, width=0.5, label='CoV2', color='red')
 
-		stack_plot_file=os.path.abspath(os.path.join(self.cov2outdir,'Samples_stackbar.png'))
+		stack_plot_file=self.cov2outdir+'Samples_stackbar.png'
 		plt.xticks(ind, Sample, rotation = 90)
 		plt.ylabel("Relative Composition")
 		plt.xlabel("")
@@ -281,7 +280,7 @@ class CoV2ReportGenerator(object):
 		plt.close(fig=None)
 
 		print("Abundance stack plot is generated!")
-		print("Abundance stack plot is generated!")
+		#print("Abundance stack plot is generated!")
 
 		image_file_list=[fpkm_plot_file,stack_plot_file]
 		return image_file_list
@@ -295,7 +294,7 @@ class CoV2ReportGenerator(object):
 			print(e)
 			print("Error in Clade Assessment")
 			sys.exit(0)
-		cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
+		cov2_clade_out=self.cov2outdir+"Variant_based_clade_assessment.csv"
 		clade_df.to_csv(cov2_clade_out)
 
 		return clade_df
@@ -307,7 +306,7 @@ class CoV2ReportGenerator(object):
 			novel_var_df=self.varcladeassessmentobj_.get_novel_variant_data_frame()
 		except:
 			print("Error in Novel Variant")
-		novel_var_out=os.path.join(self.cov2outdir,"Novel_variant.csv")
+		novel_var_out=self.cov2outdir+"Novel_variant.csv")
 		novel_var_df.to_csv(novel_var_out)
 
 		return novel_var_df
