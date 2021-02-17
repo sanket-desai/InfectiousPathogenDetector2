@@ -306,7 +306,7 @@ class CoV2ReportGenerator(object):
 			novel_var_df=self.varcladeassessmentobj_.get_novel_variant_data_frame()
 		except:
 			print("Error in Novel Variant")
-		novel_var_out=self.cov2outdir+"Novel_variant.csv")
+		novel_var_out=self.cov2outdir+"Novel_variant.csv"
 		novel_var_df.to_csv(novel_var_out)
 
 		return novel_var_df
