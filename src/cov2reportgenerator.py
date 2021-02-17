@@ -190,7 +190,7 @@ class CoV2ReportGenerator(object):
 				plt.xlabel('Position in SARS CoV2 Genome')
 				plt.ylabel('Depth of Coverage')
 				plt.title(title_var, loc='center')
-				plt.savefig(self.cov2outdir+sample+"_coverage.png"))
+				plt.savefig(self.cov2outdir+sample+"_coverage.png")
 				plt.close(fig=None)
 				image_file_list.append(self.cov2outdir+sample+"_coverage.png")
 				print(str(sample)+"\t"+str(median),file=coverage_out)
