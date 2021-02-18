@@ -63,38 +63,92 @@ class CladesTSVParser(object):
     def __init__(self, fname, hasheader):
         self.header_=''
         self.filename_=fname
-        self.site_record_map_={} # site_alt -> [arr of record] # order clade gene site alt
-        self.clade_sitealt_map_={} # clade -> [arr of site_alt keys]
+        #self.site_record_map_={} # site_alt -> [arr of record] # order clade gene site alt
+        self.site_clades_map_={}
+        self.clades_=[]
+        #self.clade_probscore_map_={} # clade -> probability score for a sample
         fi=open(self.filename_)
         if hasheader:
             self.header_ = fi.readline().strip().split('\t')
         for l in fi:
             if len(l)>1:
                 cr=CladeTSVRecord(l)
-                self.site_record_map_[cr.key()]=cr
-                if not cr.clade_ in self.clade_sitealt_map_:
-                    self.clade_sitealt_map_[cr.clade_]=[ cr.key() ]
+                #self.site_record_map_[cr.key()]=cr
+                if not cr.clade_ in self.clades_:
+                    #self.clade_probscore_map_[cr.clade_]=0
+                    self.clades_.append(cr.clade_)
+                    self.site_clades_map_[cr.key()]=[cr.clade_]
                 else:
-                    csa=self.clade_sitealt_map_[cr.clade_]
-                    csa.append(cr.key())
-                    self.clade_sitealt_map_[cr.clade_]=csa
+                    tempclades=self.site_clades_map_[cr.key()]
+                    tempclades.append([cr.clade_])
+                    #self.site_clades_map_[cr.key()]=tempclades
+                    #csa=self.clade_sitealt_map_[cr.clade_]
+                    #csa.append(cr.key())
+                    #self.clade_sitealt_map_[cr.clade_]=csa
         fi.close()
-    def get_keys_for_clade(self,sclade):
-        return self.clade_sitealt_map_[sclade]
-    def get_number_of_clade_defining_variants(self, sclade):
-        return len(self.clade_sitealt_map_[sclade])
-    def get_number_of_subclade_defining_variants(self, sclade):
-        return len(self.subclade_sitealt_map_[sclade])
-    def get_clades_matching_variant(self, pysamvariant):
-        cla=[] #multiple clades could be mappng same variant
-        for va in pysamvariant.alts:
-            vk=str(pysamvariant.pos)+"_"+va
-            if vk in self.site_record_map_:
-                cla.append(self.site_record_map_[vk].clade_)
-        return cla
+        #for i in self.site_clades_map_:
+        #    siteclades=self.site_clades_map_[i]
+        #    numclades=len(siteclades)
+        #    for j in siteclades:
+        #        self.clade_probscore_map_[j]=self.clade_probscore_map_[j]+ (1/numclades) #add fraction as prob score which a variant defines for a clade
+    def get_clades_for_variant(self,skey):
+        return self.site_clades_map_[skey]
+    def is_informative_variant(self, pysamvariant):
+        skey=str(pysamvariant.pos)+"_"+pysamvariant.alts[0]
+        return skey in self.site_clades_map_
+    def get_clade_probability_score(self, varfile):
+        sample_clade_score_map={}
+        for sc in self.clades_:
+            sample_clade_score_map[sc]=0
+        while(1):
+            try:
+                vnext=next(varfile)
+                if self.is_informative_variant(vnext):
+                    skey=str(vnext.pos)+"_"+vnext.alts[0]
+                    cladesfound=self.site_clades_map_[skey]
+                    numclades=len(cladesfound)
+                    for c in self.clades_:
+                        if c in cladesfound:
+                            sample_clade_score_map[c]=sample_clade_score_map[c]+(1/numclades)
+                        else:
+                            sample_clade_score_map[c]=sample_clade_score_map[c]+0
+            except:
+                break
+        return sample_clade_score_map
+    def get_max_clade_probability(self,vfile):
+        maxprobclade=''
+        a=self.get_clade_probability_score(vfile)
+        max=0
+        for c in a:
+            if a[c] > max:
+                max=a[c]
+                maxprobclade=c
+        return maxprobclade
+
+    def assigned_clade_probability_score_map(self, pysamvariant):
+        clade_probscore_map_for_variant={}
+        skey=str(pysamvariant.pos)+"_"+pysamvariant.alts[0]
+        for i in clades_:
+            if
+        return self.clade_probscore_map_[skey]
+    #def get_number_of_clade_defining_variants(self, sclade):
+    #    return len(self.clade_sitealt_map_[sclade])
+    #def get_number_of_subclade_defining_variants(self, sclade):
+    #    return len(self.subclade_sitealt_map_[sclade])
+    #def get_clades_matching_variant(self, pysamvariant):
+    #    cla=[] #multiple clades could be mappng same variant
+    #    for va in pysamvariant.alts:
+    #        vk=str(pysamvariant.pos)+"_"+va
+    #        #if vk in self.site_record_map_:
+    #        #    cla.append(self.site_record_map_[vk].clade_)
+    #    return cla
 
 class CladeAssignment(object):
     def __init__(self, vcffile):
+        vf=pysam.VariantFile(vcffile)
+        ctp=CladesTSVParser(GlobalVar.cladestsv_, True)
+        self.maxscoreclade_=ctp.get_max_clade_probability(vf)
+        '''
         self.clade_assignment_prob_=0
         self.subclade_assignment_prob_=0
         self.clade_score_map_={}
@@ -170,6 +224,7 @@ class CladeAssignment(object):
         return self.clade_assignment_prob_
     def assigned_subclade_probablility(self):
         return self.subclade_assignment_prob_
+    '''
 class VariantAssessment(object):
     def __init__(self, vcffile):
         self.number_of_variants_=0
@@ -274,7 +329,7 @@ class VariantCladeAssessment(object):
         cladesarr=[]
         self.novelvardf_=pd.DataFrame()
         self.cladedf_=pd.DataFrame()
-        gisaidcladetsvpar=GisaidCladeTSVParser()
+        #gisaidcladetsvpar=GisaidCladeTSVParser()
         for sample in vcfmap:
             vcffile=vcfmap[sample]
             #print("Processing sample %s" %(sample))
@@ -302,10 +357,15 @@ class VariantCladeAssessment(object):
             #csubcladeprob= '%.2f' % ca.assigned_subclade_probablility()
             #cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade+"("+ccladeprob+")" ])
             cclade=""
+            ca=CladeAssignment(vcffile)
+            if ca.maxscoreclade_ != '':
+                cclade=ca.maxscoreclade_
+            '''
             if va.closest_gisaid_sample() != "":
                 cg=va.closest_gisaid_sample().split('-')
                 cginum=int(cg[2])
                 cclade=gisaidcladetsvpar.get_clade(cginum)
+            '''
             cladesarr.append([sample, str(cnumvar), crelatedgisaid, cclade ])
             print("######## Sample : %s ; Related GISAID sample: %s ; Clade : %s" %(sample, crelatedgisaid, cclade))
         if len(novvararr)>0:
