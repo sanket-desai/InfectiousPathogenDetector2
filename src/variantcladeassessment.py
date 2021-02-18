@@ -124,13 +124,6 @@ class CladesTSVParser(object):
                 max=a[c]
                 maxprobclade=c
         return maxprobclade
-
-    def assigned_clade_probability_score_map(self, pysamvariant):
-        clade_probscore_map_for_variant={}
-        skey=str(pysamvariant.pos)+"_"+pysamvariant.alts[0]
-        for i in clades_:
-            if
-        return self.clade_probscore_map_[skey]
     #def get_number_of_clade_defining_variants(self, sclade):
     #    return len(self.clade_sitealt_map_[sclade])
     #def get_number_of_subclade_defining_variants(self, sclade):
