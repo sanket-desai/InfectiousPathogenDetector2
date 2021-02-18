@@ -74,13 +74,16 @@ class CladesTSVParser(object):
             if len(l)>1:
                 cr=CladeTSVRecord(l)
                 #self.site_record_map_[cr.key()]=cr
-                if not cr.clade_ in self.clades_:
+                if not cr.clade_ in self.site_clades_map_:
+                    if not cr.clade_ in self.clades_:
+                        self.clades_.append(cr.clade_)
                     #self.clade_probscore_map_[cr.clade_]=0
-                    self.clades_.append(cr.clade_)
                     self.site_clades_map_[cr.key()]=[cr.clade_]
                 else:
                     tempclades=self.site_clades_map_[cr.key()]
-                    tempclades.append([cr.clade_])
+                    if not cr.clade_ in tempclades:
+                        tempclades.append([cr.clade_])
+                    self.site_clades_map_[cr.key()]=tempclades
                     #self.site_clades_map_[cr.key()]=tempclades
                     #csa=self.clade_sitealt_map_[cr.clade_]
                     #csa.append(cr.key())
