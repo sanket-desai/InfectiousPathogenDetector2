@@ -397,7 +397,7 @@ def main():
 		#import pdfkit
 		#pdfkit.from_file(os.path.join(cov2outdir,"Output.html"), os.path.join(cov2outdir,"OutputReport.pdf"))
 		#2.0 uses wkhtmltopdf
-		cmd= "wkhtmltopdf " + cov2outdir+"Output.html " +cov2outdir+"OutputReport.pdf"
+		cmd= "wkhtmltopdf " + self.cov2outdir+"Output.html " +self.cov2outdir+"OutputReport.pdf"
 		cprocess=subprocess.run(cmd, shell=True)
 		cprocess.check_returncode()
 if __name__ =="__main__":
