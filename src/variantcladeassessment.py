@@ -73,27 +73,16 @@ class CladesTSVParser(object):
         for l in fi:
             if len(l)>1:
                 cr=CladeTSVRecord(l)
-                #self.site_record_map_[cr.key()]=cr
                 if not cr.clade_ in self.site_clades_map_:
                     if not cr.clade_ in self.clades_:
                         self.clades_.append(cr.clade_)
-                    #self.clade_probscore_map_[cr.clade_]=0
                     self.site_clades_map_[cr.key()]=[cr.clade_]
                 else:
                     tempclades=self.site_clades_map_[cr.key()]
                     if not cr.clade_ in tempclades:
-                        tempclades.append([cr.clade_])
+                        tempclades.append(cr.clade_)
                     self.site_clades_map_[cr.key()]=tempclades
-                    #self.site_clades_map_[cr.key()]=tempclades
-                    #csa=self.clade_sitealt_map_[cr.clade_]
-                    #csa.append(cr.key())
-                    #self.clade_sitealt_map_[cr.clade_]=csa
         fi.close()
-        #for i in self.site_clades_map_:
-        #    siteclades=self.site_clades_map_[i]
-        #    numclades=len(siteclades)
-        #    for j in siteclades:
-        #        self.clade_probscore_map_[j]=self.clade_probscore_map_[j]+ (1/numclades) #add fraction as prob score which a variant defines for a clade
     def get_clades_for_variant(self,skey):
         return self.site_clades_map_[skey]
     def is_informative_variant(self, pysamvariant):
@@ -127,100 +116,11 @@ class CladesTSVParser(object):
                 max=a[c]
                 maxprobclade=c
         return maxprobclade
-    #def get_number_of_clade_defining_variants(self, sclade):
-    #    return len(self.clade_sitealt_map_[sclade])
-    #def get_number_of_subclade_defining_variants(self, sclade):
-    #    return len(self.subclade_sitealt_map_[sclade])
-    #def get_clades_matching_variant(self, pysamvariant):
-    #    cla=[] #multiple clades could be mappng same variant
-    #    for va in pysamvariant.alts:
-    #        vk=str(pysamvariant.pos)+"_"+va
-    #        #if vk in self.site_record_map_:
-    #        #    cla.append(self.site_record_map_[vk].clade_)
-    #    return cla
-
 class CladeAssignment(object):
     def __init__(self, vcffile):
         vf=pysam.VariantFile(vcffile)
         ctp=CladesTSVParser(GlobalVar.cladestsv_, True)
         self.maxscoreclade_=ctp.get_max_clade_probability(vf)
-        '''
-        self.clade_assignment_prob_=0
-        self.subclade_assignment_prob_=0
-        self.clade_score_map_={}
-        self.subclade_score_map_={}
-        #stores the clade -> number of clade supporting variants found in vcf
-        #finally the one with highest support will be returned as an assigned clade
-        self.cladetsvparser_obj_=CladesTSVParser(GlobalVar.cladestsv_, True)
-        #primary clade assignment
-        #ctsvp=CladesTSVParser(GlobalVar.cladestsv_, True)
-        try:
-            vf=pysam.VariantFile(vcffile)
-            while(1):
-                try:
-                    vnext=next(vf)
-                    arrclades=self.cladetsvparser_obj_.get_clades_matching_variant(vnext)
-                    for c in arrclades:
-                        if not c in self.clade_score_map_:
-                            self.clade_score_map_[c]=1
-                        else:
-                            self.clade_score_map_[c]=self.clade_score_map_[c]+1
-                except:
-                    break
-        except Exception as e:
-            print("Clade assignment failed due to followig exception: ")
-            print(e)
-            sys.exit(0)
-        self.subcladetsvparser_obj_=CladesTSVParser(GlobalVar.subcladestsv_, False)
-        #sctsvp=CladesTSVParser(GlobalVar.subcladestsv_, False)
-        try:
-            vf=pysam.VariantFile(vcffile)
-            while(1):
-                try:
-                    vnext=next(vf)
-                    arrclades=self.subcladetsvparser_obj_.get_clades_matching_variant(vnext)
-                    for c in arrclades:
-                        if not c in self.subclade_score_map_:
-                            self.subclade_score_map_[c]=1
-                        else:
-                            self.subclade_score_map_[c]=self.subclade_score_map_[c]+1
-                except:
-                    break
-        except Exception as e:
-            print("Sub-clade assignment failed due to followig exception: ")
-            print(e)
-            sys.exit(0)
-    def assigned_clade(self):
-        maxscoreclade=''
-        maxscore=0
-        for c in self.clade_score_map_:
-            if self.clade_score_map_[c] > maxscore:
-                maxscoreclade=c
-                maxscore=self.clade_score_map_[c]
-        #All clade defining variants match
-        if not maxscoreclade == '':
-            self.clade_assignment_prob_= maxscore / self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
-            #if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
-            #    maxscoreclade=''
-        return maxscoreclade
-    def assigned_subclade(self):
-        maxscoreclade=''
-        maxscore=0
-        for c in self.subclade_score_map_:
-            if self.subclade_score_map_[c] > maxscore:
-                maxscoreclade=c
-                maxscore=self.subclade_score_map_[c]
-        #All clade defining variants match
-        if not maxscoreclade == '':
-            self.subclade_assignment_prob_ = maxscore / self.subcladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade)
-            #if not maxscore >= self.cladetsvparser_obj_.get_number_of_clade_defining_variants(maxscoreclade):
-            #    maxscoreclade=''
-        return maxscoreclade
-    def assigned_clade_probability(self):
-        return self.clade_assignment_prob_
-    def assigned_subclade_probablility(self):
-        return self.subclade_assignment_prob_
-    '''
 class VariantAssessment(object):
     def __init__(self, vcffile):
         self.number_of_variants_=0
@@ -374,5 +274,3 @@ class VariantCladeAssessment(object):
         return self.novelvardf_
     def get_clade_assessment_data_frame(self):
         return self.cladedf_
-		#cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")
-		#clade_df.to_csv(cov2_clade_out)
