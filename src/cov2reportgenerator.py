@@ -75,7 +75,7 @@ class CoV2ReportGenerator(object):
 					sample=vcf_sample.replace("_final_annotated.vcf","")
 					self.vcf_map[sample]=vcf
 			#where clade assignment happens
-			print(self.vcf_map)
+			#print(self.vcf_map)
 			self.varcladeassessmentobj_=VariantCladeAssessment(self.vcf_map)
 			#self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
 		else:
@@ -397,7 +397,7 @@ def main():
 		#import pdfkit
 		#pdfkit.from_file(os.path.join(cov2outdir,"Output.html"), os.path.join(cov2outdir,"OutputReport.pdf"))
 		#2.0 uses wkhtmltopdf
-		cmd= "wkhtmltopdf " + self.cov2outdir+"Output.html " +self.cov2outdir+"OutputReport.pdf"
+		cmd= "wkhtmltopdf " + cov2outdir+"Output.html " +cov2outdir+"OutputReport.pdf"
 		cprocess=subprocess.run(cmd, shell=True)
 		cprocess.check_returncode()
 if __name__ =="__main__":
