@@ -398,8 +398,8 @@ class IPDShortRead(object):
 			cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2hspathoindex_+" -1 "+self.inputmap_["r1"]+" -2 "+self.inputmap_["r2"]+" --threads "+str(self.inputmap_["threads"])+  " --summary-file "+ self.primaryalignmentsummary_ +" -S " +self.primarysam_
 			#cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2pathoindex_+" -1 "+self.inputmap_["r1"]+" -2 "+self.inputmap_["r2"]+" --threads "+str(self.inputmap_["threads"])+  " --summary-file "+ self.primaryalignmentsummary_ +" -S " +self.primarysam_
 		else:
-			#cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2hspathoindex_+" -U "+self.inputmap_["r1"]+" --threads "+str(self.inputmap_["threads"])+ " --summary-file "+ self.primaryalignmentsummary_ + " -S " +self.primarysam_
-			cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2pathoindex_+" -U "+self.inputmap_["r1"]+" --threads "+str(self.inputmap_["threads"])+ " --summary-file "+ self.primaryalignmentsummary_ + " -S " +self.primarysam_
+			cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2hspathoindex_+" -U "+self.inputmap_["r1"]+" --threads "+str(self.inputmap_["threads"])+ " --summary-file "+ self.primaryalignmentsummary_ + " -S " +self.primarysam_
+			#cmd=GlobalVar.hisat2_+" -x "+GlobalVar.hisat2pathoindex_+" -U "+self.inputmap_["r1"]+" --threads "+str(self.inputmap_["threads"])+ " --summary-file "+ self.primaryalignmentsummary_ + " -S " +self.primarysam_
 		#print(cmd)
 		cprocess=subprocess.run(cmd, shell=True)
 		#raises subprocess.CalledProcessError if returncode is non-zero
