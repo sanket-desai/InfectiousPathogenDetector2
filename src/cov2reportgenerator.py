@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 '''
 
-Author	  : Sonal Rashmi / Sanket
-Date		: 17/07/2020 / 08/01/2020
+Author	  	: Sonal Rashmi / Sanket
+Date		: 17/07/2020 / 08/01/2021
 Description : It takes the IPD directory post successful completion of IPD run, generates a html report with Basic Alignment stats(using picard), Coverage of SARS-CoV2(using samtools), abundance plots (Overall and SARS-CoV2), Novel variant and Clade assessment
 version : 2
 '''

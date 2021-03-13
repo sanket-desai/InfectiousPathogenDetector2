@@ -1,6 +1,10 @@
-# IPD 2.0 (Infection Pathogen Detector2)
+# IPD 2.0 (Infection Pathogen Detector 2)
 
-IPD 2.0 (an updated version of [Infectious Pathogen Detector2](https://github.com/sanket-desai/InfectiousPathogenDetector)) is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogeneous NGS platforms. IPD2 performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD2 additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and to generate an automated report.
+
+
+IPD 2.0 (an updated version of [Infectious Pathogen Detector](https://github.com/sanket-desai/InfectiousPathogenDetector)) is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogeneous NGS platforms. IPD 2.0 performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD 2.0 additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and to generate an automated report.
+
+
 
 ## Getting Started
 
@@ -14,9 +18,10 @@ IPD 2.0 is developed using python3.
 
 With the following system prerequisites in place, users can use the following commands in the Linux / Unix environment to install the required python packages.
 
+
 ### Installation
 
-IPD 2.0 can be downloaded from this [webpage](http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html). Untar the downloaded tar.gz file using the following command:
+IPD 2.0 can be downloaded from this [webpage](http://www.actrec.gov.in/pi-webpages/AmitDutt/IPD/IPD.html). Untar the downloaded ipd2.tar.gz file using the following command:
 ```
 tar xvzf ipd2.tar.gz
 cd ipd2
@@ -26,7 +31,7 @@ The pre-build reference files need to be downloaded from [here](http://ipd.actre
 tar xvzf data.tar.gz
 ```
 Make sure that the complete 'untarred' data directory is present in the ipd2 home directory before proceeding with the further installation and running IPD 2.0.
-In the home directory of IPD2 (ipd2), run the following command:
+In the home directory of IPD 2.0 (ipd2), run the following command:
 
 ```
 conda env create -f ipdenv.yml
@@ -34,7 +39,15 @@ conda env create -f ipdenv.yml
 This installs all the dependencies and tools required to run IPD 2.0.
 Please note: Make sure you do not have the tools such as Blast, Hisat2, Subread / FeatureCounts, minimap2 added in the PATH variable. The tools on the host machine (when in PATH) are prioritized in usage when compared to the once present in the Conda environment.
 
-For running any script pertaining to IPD 2.0, make sure that the IPD Conda environment is activated. More information about Conda environments can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
+For running any script pertaining to IPD 2.0 (including the pathogen database update and SARS-CoV-2 variant database update scripts in "src" directory), make sure that the IPD Conda environment is activated. More information about Conda environments can be found [here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). IPD conda environment can be activated using the following command:
+
+```
+conda activate ipd
+```
+
+
+
+### Updating pathogen database and SARS-CoV-2 variant database
 
 **Adding pathogens of choice to IPD 2.0 database**
 
@@ -48,7 +61,21 @@ $ python3 ipdupdatedb.py -f <format> -i <input file>
 
 ![ipdupdate](ipdupdate_screenshot.png)
 
-### Running IPD 2.0
+
+
+**Updating SARS-CoV-2 variant database with inclusion of latest GISAID genome sequences**
+
+SARS-CoV-2 genomes are being submitted at an unprecedented rate, with addition of thousands of sequences to GISAID database every data. In order to maintain the relevance of SARS-CoV-2 module of IPD 2.0, we have added a module which automatically updates the variant database using the recently downloaded SARS-CoV-2 genomes from GISAID. Users are required to provide the SARS-CoV-2 genome sequences in the Fasta file format, as obtained from GISAID. The updater program also allows users to filter sequences having length lower than threshold (specified using '-l' option, default=29,000) and the maximum 'N' in the sequences below the specified threshold (specified using '-N' option, default=15,000). The updater program creates a 'representative_tabvar_sorted.tsv.gz' (and an index file 'representative_tabvar_sorted.tsv.gz.tbi'), which contains all the variants and representative samples (mutation profiles), which can replace the database files in "data/cov2moduleref/" of IPD 2.0.  
+
+**Command:**
+
+```
+$ python3 ipdsarscov2updater.py -f <gisaid fasta format file> -o <output directory> -l <minimum threshold of genome length> -N <allowed 'N' in the genome sequences> -t <threads>
+```
+
+
+
+## Running IPD 2.0
 
 The required scripts to run IPD 2.0 are placed in the “src” directory of IPD. IPD can be run in two modes; command line (ipd_cli.py) or the GUI mode (ipd_gui.py). By going into the /src directory of ipd2, users can run the program as shown below:
 
@@ -58,15 +85,17 @@ The required scripts to run IPD 2.0 are placed in the “src” directory of IPD
 $ python3 ipd_cli.py
 ```
 
-**For GUI: **
+**For GUI:**
 
 ```
 $ python3 ipd_gui.py
 ```
 
+
+
 ### Guide to use command-line interface of IPD 2.0
 
-Scripts are present in the src folder. src should be used as the execution directory, output directory will be used as the working directory. The screen-shot below explains the options available in the interface and its usage. There are two modes in the IPD command-line interface based on the sequencing type selected (long read sequencing and short read sequencing)
+Scripts are present in the ./src directory. "src" should be used as the execution directory, output directory will be used as the working directory. The screen-shot below explains the options available in the interface and its usage. There are two modes in the IPD command-line interface based on the sequencing type selected (long read sequencing and short read sequencing)
 
 **Command:**
 
@@ -96,7 +125,9 @@ $ python3 ipd_cli.py short -p <project name> -t <number of threads default 4> -o
 
 ![cli_shortread](cli_shortread.png)
 
-### SARS-CoV2 report generation
+
+
+## SARS-CoV2 report generation
 
 SARS-Cov2 report generation script enables to user to visualize the coverage and expression of SARS-CoV2 in the sample. Further it provides a detailed summary of the reads, and assign clades based on the SARS-CoV2 variant profile. It required the output directory post IPD run. The code accesses the required files and generate a HTML report in the same output directory as Output.html (Refer Page 6 of 6 for sample IPD report)
 
@@ -108,7 +139,9 @@ $python3 cov2reportgenerator.py -dir <output directory>
 
 ![sars_cov2_screenshot](sars_cov2.png)
 
-### IPD output
+
+
+## IPD output
 
 Sample HTML Report is attached below.
 
