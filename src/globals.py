@@ -113,6 +113,7 @@ class GlobalVar(object):
 	#No entry for NanoFilt and longshot, since these will be directly run on CLI
 
 	##cov2 module
+	sarscov2gbk_="../data/cov2moduleref/NC_045512.gb"
 	hspathofa_="../data/primaryref/hspathoref/hspatho.fa"
 	gisaidcladestsv_="../data/cov2moduleref/gisaid_hcov_clades.tsv"
 	cladestsv_="../data/cov2moduleref/clades.tsv"

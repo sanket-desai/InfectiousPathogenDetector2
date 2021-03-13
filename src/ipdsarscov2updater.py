@@ -139,14 +139,18 @@ class GISAIDPreprocessing(object):
 
 #define parser and subparsers
 def main():
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument('-f',dest='ifasta',type=str, required=True,help="GISAID fasta sequence file")
-    parent_parser.add_argument('-l',dest='mingenlen',type=int,default=29000, required=False,help="Minimum SARS-CoV-2 genome length to consider for database creation")
-    parent_parser.add_argument('-t',dest='threads',type=int,default=2,required=False,help="Set number of threads (default = 4)")
-    parent_parser.add_argument('-N',dest='maxnumn',type=int,default=10000,required=False,help="Maximum number of 'N' allowed in the genome sequence")
-    parent_parser.add_argument('-o',dest='outdir',type= lambda path:dir_path(path),required=True,default=os.getcwd(),help="Output directory to process the intermediate files")
+    parent_parser=argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description= '''Infectious Pathogen Detector 2.0 SARS-CoV-2 variant database updater module
+Developed by Dutt lab
+Version v1.0.2''')
+    #parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('-f', action='store', dest='ifasta',type=str, required=True,help="GISAID fasta sequence file")
+    parent_parser.add_argument('-l',action='store', dest='mingenlen',type=int,default=29000, required=False,help="Minimum SARS-CoV-2 genome length to consider for database creation")
+    parent_parser.add_argument('-t',action='store', dest='threads',type=int,default=2,required=False,help="Set number of threads (default = 4)")
+    parent_parser.add_argument('-N',action='store', dest='maxnumn',type=int,default=10000,required=False,help="Maximum number of 'N' allowed in the genome sequence")
+    parent_parser.add_argument('-o',action='store', dest='outdir',type= lambda path:dir_path(path),required=True,default=os.getcwd(),help="Output directory to process the intermediate files")
     #parser = argparse.ArgumentParser(add_help=False)
-    sarscov2gbk="../data/cov2moduleref/NC_045512.gb"
+    #sarscov2gbk="../data/cov2moduleref/NC_045512.gb"
+    sarscov2gbk=GlobalVar.sarscov2gbk_
     repfileheader="chrom\tpos\ttype\tref\talt\tevidence\tfeattype\tstrand\tnt_pos\taa_poseffect\tlocus_tag\tgene\tproduct\tsamplename\tid\tdate"
     args = parent_parser.parse_args()
     if len(sys.argv) == 1:
@@ -166,7 +170,7 @@ def main():
         ofcombinedsnippyout.write("%s\n" %(repfileheader))
         gp=GISAIDPreprocessing(args.ifasta, args.mingenlen, args.maxnumn, args.outdir)
         #Run snippy for each fasta
-        
+
 	    for f in glob.glob(splitfastadir+"*.fa"):
             pre=os.path.splitext(os.path.basename(f))[0]
             cmd="snippy --ctgs " +f+ " --ref " +sarscov2gbk+ " --outdir " +snippyoutdir+ " --prefix " +pre+ " --force --cpus "+str(args.threads)
@@ -193,17 +197,12 @@ def main():
                         if len(si) < 14:
                             while len(si) < 14:
                                 si.append("")
-                            #print(si)
-                            #print("Exiting inside first if")
-                            #sys.exit(0)
-                        #ofo.write("%s\t%s\t%s\t%s\n" %(i.strip(), seqn, eslid, date.replace(".tab","")) )
-                        #ii=",".join( i.strip().split("\t") )
                         ii=",".join( si )
                         if len(seqn)==0 or len(eslid) == 0 or len(ii) == 0:
                             print(si)
                             sys.exit(0)
                         sseqn=seqn.split("/")
-                        seqn=sseqn[len(sseqn)-1]    
+                        seqn=sseqn[len(sseqn)-1]
                         ofcombinedsnippyout.write("%s,%s,%s,%s\n" %(ii, seqn, eslid, date.replace(".tab","")))
                 except Exception as e:
                     print(e)
