@@ -6,7 +6,7 @@ IPD 2.0 (an updated version of [Infectious Pathogen Detector](https://github.com
 
 ## Availability of IPD 2.0
 
-IPD 2.0 is available as a desktop/ local version (installation instructions below), as well as a web-based version (http://ipd.actrec.gov.in/ipdweb/). The detailed usage of the desktop (local) version of IPD 2.0 has been described below. For the web-version, users are required to input data on the job submission form with their details on the webpage: http://ipd.actrec.gov.in/ipdweb/ . Upon run completion, the results are mailed back to the user on the provided e-mail ID. Users can test the working of the IPD 2.0 web-server using the following test dataset: for short read data click on the [read1 file](https://github.com/sanket-desai/InfectiousPathogenDetector/raw/master/testdata/short/testdata_R1.fastq.gz) and [read2 file](https://github.com/sanket-desai/InfectiousPathogenDetector/raw/master/testdata/short/testdata_R2.fastq.gz) links and for long-read data click [here](https://github.com/sanket-desai/InfectiousPathogenDetector/raw/master/testdata/long/testdata.fastq.gz).
+IPD 2.0 is available as a desktop/ local version (installation instructions below), as well as a web-based version (http://ipd.actrec.gov.in/ipdweb/). The detailed usage of the desktop (local) version of IPD 2.0 has been described below. For the web-version, users are required to input data on the job submission form with their details on the webpage: http://ipd.actrec.gov.in/ipdweb/ . Upon run completion, the results are mailed back to the user on the provided e-mail ID. Users can test the working of the IPD 2.0 web-server using the following test dataset (both short- and long-read): http://ipd.actrec.gov.in/testdata/
 
 ## Getting Started
 
